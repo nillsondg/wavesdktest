@@ -16,18 +16,18 @@ import (
 	"net/http"
 )
 
-type address struct {
+type Address struct {
     Address string
     PublicKey string
     PrivateKey string
-    Callbacks map[string]func(address)
+    Callbacks map[string]func(Address)
 }
 
-type asset struct {
+type Asset struct {
     AssetId string
 }
 
-func genAdress(seed string) address {
+func GenAddress(seed string) Address {
       //encoded := base58.Encode([]byte(seed))
       //fmt.Println(string(encoded))
       encodedNonce := append([]byte("\x00\x00\x00\x00"), seed...)
@@ -80,17 +80,17 @@ type transaction struct {
     Attachment string `json:"attachment"`
     Signature string `json:"signature"`
 }
-func Newaddress() address {
-    var a address
-    a.Callbacks = make(map[string]func(address))
+func Newaddress() Address {
+    var a Address
+    a.Callbacks = make(map[string]func(Address))
     return a
 }
 
-func (addr *address) on(calltype string, callback func(address)) {
+func (addr *Address) On(calltype string, callback func(Address)) {
     addr.Callbacks[calltype] = callback
 }
 
-func (addr *address) callback(calltype string) {
+func (addr *Address) callback(calltype string) {
     for k, v := range addr.Callbacks {
         if k == calltype{
           v(*addr)
@@ -98,7 +98,7 @@ func (addr *address) callback(calltype string) {
     }
 }
 
-func (addr *address) transfer(anotherAddress string, amount int64, fee int64) {
+func (addr *Address) Transfer(anotherAddress string, amount int64, fee int64) {
 
     timestamp := time.Now().Unix() * 1000
 
@@ -138,7 +138,7 @@ func (addr *address) transfer(anotherAddress string, amount int64, fee int64) {
     addr.callback("transaction")
 }
 
-func (addr *address) transferAsset(anotherAddress string, amount int64, fee int64, as *asset) {
+func (addr *Address) TransferAsset(anotherAddress string, amount int64, fee int64, as *Asset) {
 
     timestamp := time.Now().Unix() * 1000
 
